@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('table_orders', function (Blueprint $table) {
             $table->id('id');
-            $table->foreignId('id_customer')->constrained('table_customers')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->date('order_date');
             $table->enum('status_pengiriman', ['belum', 'sedang_diproses', 'sudah_dikirim'])->default('belum');
             $table->enum('status_pembayaran', ['belum_bayar', 'sudah_bayar'])->default('belum_bayar');

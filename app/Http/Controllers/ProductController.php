@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Http\Controllers;
+
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -21,13 +23,21 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'image' => 'nullable|image',
+            'image' => 'nullable|image|max:2048',
             'description' => 'required',
             'price' => 'required|numeric',
             'stock' => 'required|integer',
         ]);
 
-        Product::create($request->all());
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            $filename = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $filename);
+            $data['image'] = $filename;
+        }
+
+        Product::create($data);
 
         return redirect()->route('product.index')->with('success', 'Produk berhasil ditambahkan');
     }
@@ -40,8 +50,24 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'name' => 'required',
+            'image' => 'nullable|image|max:2048',
+            'description' => 'required',
+            'price' => 'required|numeric',
+            'stock' => 'required|integer',
+        ]);
+
         $product = Product::findOrFail($id);
-        $product->update($request->all());
+        $data = $request->except('image');
+
+        if ($request->hasFile('image')) {
+            $filename = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $filename);
+            $data['image'] = $filename;
+        }
+
+        $product->update($data);
 
         return redirect()->route('product.index')->with('success', 'Produk berhasil diupdate');
     }
